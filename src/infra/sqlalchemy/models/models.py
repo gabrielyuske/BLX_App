@@ -8,7 +8,6 @@ class Usuario(Base):
     nome = Column( String )
     senha = Column(String)
     telefone = Column(String)
-
     # Criando ligacao com Usuario eo Produto
     produtos = relationship("Produto",back_populates="usuario")
     # ONE TO MANY
