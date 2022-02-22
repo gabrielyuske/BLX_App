@@ -1,13 +1,6 @@
-from fastapi import FastAPI,Depends,status
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from typing import List
-from sqlalchemy.orm import Session
-from src.infra.sqlalchemy.config.database import criar_bd, get_db
-from src.schemas.schemas import Produto,ProdutoSimples,Usuario
-from src.infra.sqlalchemy.repositorios.repositorio_produto import RepositorioProduto
-from src.infra.sqlalchemy.repositorios.repositorio_usuario import RepositorioUsuario
-
-# criar_bd()
+from src.routers import rotas_Produtos,rotas_Usuarios
 
 app = FastAPI()
 
@@ -22,40 +15,9 @@ app.add_middleware(CORSMiddleware,
 
 # ROTAS PRODUTOS
 
-#                     status_code=201
-@app.post("/produtos",status_code=status.HTTP_201_CREATED,response_model=ProdutoSimples)
-def criar_produto(produto:Produto,db: Session = Depends(get_db)):
-    produto_criado = RepositorioProduto(db).criar(produto)
-    return produto_criado
-
-@app.get("/produtos",response_model=List[Produto])
-def listar_produtos(db: Session = Depends(get_db)):
-    produtos = RepositorioProduto(db).listar()
-    return produtos
-
-@app.put("/produtos/{id}",response_model=ProdutoSimples)
-def atualizar_produto(id:int,produto:Produto,session:Session = Depends(get_db)):
-    RepositorioProduto(session).editar(id, produto)
-    produto.id = id
-    return produto
-        # ,{"message": "PRODUTO ATUALIZADO"}
-
-@app.delete("/produtos/{id}")
-def remover_produto(id:int,session:Session = Depends(get_db)):
-    RepositorioProduto(session).remover(id)
-    return {"msg":"DELETADO COM SUCESSO"}
-
+app.include_router( rotas_Produtos.router )
 
 # ROTAS USUARIOS
 
-@app.post("/signup",status_code=status.HTTP_201_CREATED,response_model=Usuario)
-def signup(usuario:Usuario,session:Session = Depends(get_db)):
-    usuario_criado = RepositorioUsuario(session).criar(usuario)
-    return usuario_criado
-
-@app.get("/usuarios",response_model=List[Usuario])
-def listar_usuarios(session:Session = Depends(get_db)):
-    usuarios = RepositorioUsuario(session).listar()
-    return usuarios
-
+app.include_router(  rotas_Usuarios.router )
 
