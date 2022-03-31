@@ -34,7 +34,7 @@ class Pedido(Base):
 
     id = Column(Integer,primary_key=True,index=True)
     quantidade = Column(Integer)
-    local_estrega = Column(String)
+    local_entrega = Column(String)
     tipo_entrega = Column(String)
     observacao = Column(String)
 

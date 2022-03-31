@@ -48,8 +48,10 @@ class Pedido(BaseModel):
     id:Optional[int] = None
     quantidade: int
     local_entrega : Optional[str]
+    # consertei o nome da column que eu coloquei errado com esse codigo no SQL 
+    # ALTER TABLE pedido RENAME COLUMN local_estrega TO local_entrega
     tipo_entrega : str
-    endereco: str
+    # endereco: str
     observacao : Optional[str] = "Sem observacao"
 
     usuario_id: Optional[int]
@@ -58,3 +60,5 @@ class Pedido(BaseModel):
     usuario: Optional[UsuarioSimples]
     produto: Optional[ProdutoSimples]
 
+    class Config:
+        orm_mode = True

@@ -1,4 +1,5 @@
-from fastapi import APIRouter,Depends
+from http.client import HTTPException
+from fastapi import APIRouter,Depends,Depends,HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 from src.infra.sqlalchemy.config.database import get_db
@@ -12,10 +13,14 @@ def fazer_pedido(pedido: Pedido,session:Session = Depends(get_db)):
     pedido_criado = RepositorioPedido(session).gravar_pedido(pedido)
     return pedido_criado
 
-@router.get("/pedidos{id}",response_model=Pedido)
+@router.get("/pedidos/{id}",response_model=Pedido)
 def exibir_pedido(id:int,session:Session = Depends(get_db)):
-    pedido = RepositorioPedido(session).buscar_por_id(id)
-    return pedido
+    
+    try:
+        pedido = RepositorioPedido(session).buscar_por_id(id)
+        return pedido
+    except:
+        raise HTTPException(status_code=404,detail=f"NAO HA PEDIDO COM ESSE ID = {id}")
 
 @router.get("/pedidos/{usuario_id}/compras",response_model=List[Pedido])
 def listar_pedidos(usuario_id:int,session:Session = Depends(get_db)):
