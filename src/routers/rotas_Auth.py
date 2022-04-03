@@ -1,7 +1,7 @@
 from fastapi import APIRouter,status,Depends,HTTPException
 from sqlalchemy.orm import Session
 from src.infra.sqlalchemy.config.database import get_db
-from src.schemas.schemas import Usuario,UsuarioSimples,LoginData
+from src.schemas.schemas import Usuario,UsuarioSimples,LoginData,LoginSucesso
 from src.infra.sqlalchemy.repositorios.repositorio_usuario import RepositorioUsuario
 from src.infra.providers import hash_provider,token_provider
 from src.routers.auth_utils import obter_usuario_logado
@@ -21,7 +21,7 @@ def signup(usuario:Usuario,session:Session = Depends(get_db)):
     usuario_criado = RepositorioUsuario(session).criar(usuario)
     return usuario_criado
 
-@router.post("/token")
+@router.post("/token",response_model=LoginSucesso)
 def login(login_data:LoginData,session:Session =Depends(get_db)):
     senha = login_data.senha
     telefone = login_data.telefone
@@ -36,9 +36,10 @@ def login(login_data:LoginData,session:Session =Depends(get_db)):
 
     # GERAR TOKEN
     token = token_provider.criar_access_token({"sub":usuario.telefone})
-    return {"usuario":usuario, "access_token":token}
+    return LoginSucesso(usuario=usuario,access_token = token)
 
 @router.get("/me",response_model=UsuarioSimples)
+# ajyste
 def me(usuario: Usuario = Depends(obter_usuario_logado)):
     return usuario
 

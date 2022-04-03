@@ -2,8 +2,9 @@ from http.client import HTTPException
 from fastapi import APIRouter,Depends,Depends,HTTPException
 from sqlalchemy.orm import Session
 from typing import List
+from src.routers.auth_utils import obter_usuario_logado
 from src.infra.sqlalchemy.config.database import get_db
-from src.schemas.schemas import Pedido
+from src.schemas.schemas import Pedido,UsuarioSimples,Usuario
 from src.infra.sqlalchemy.repositorios.repositorio_pedido import RepositorioPedido
 
 router = APIRouter()
@@ -22,9 +23,9 @@ def exibir_pedido(id:int,session:Session = Depends(get_db)):
     except:
         raise HTTPException(status_code=404,detail=f"NAO HA PEDIDO COM ESSE ID = {id}")
 
-@router.get("/pedidos/{usuario_id}/compras",response_model=List[Pedido])
-def listar_pedidos(usuario_id:int,session:Session = Depends(get_db)):
-    pedidos = RepositorioPedido(session).listar_meus_pedidos_por_usuario_id(usuario_id)
+@router.get("/pedidos",response_model=List[Pedido])
+def listar_pedidos(usuario:Usuario = Depends(obter_usuario_logado),session:Session = Depends(get_db)):
+    pedidos = RepositorioPedido(session).listar_meus_pedidos_por_usuario_id(usuario.id)
     return pedidos
 
 @router.get("/pedidos/{usuario_id}/vendas",response_model=List[Pedido])
